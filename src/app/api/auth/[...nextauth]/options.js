@@ -1,4 +1,3 @@
-import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { connectDB } from "@/config/db";
@@ -16,23 +15,23 @@ export const authOptions = {
     }),
   ],
   session: {
-    jwt: true,
+    strategy: "jwt", // Use 'jwt' for stateless sessions
   },
   callbacks: {
     async jwt({ token, user }) {
       try {
         if (user) {
           await connectDB();
-          const userExist = await userModel.findOne({ email: user.email });
+          let existingUser = await userModel.findOne({ email: user.email });
 
-          if (!userExist) {
-            let username = user.email.split("@")[0];
-            let existingUser = await userModel.findOne({ username });
+          if (!existingUser) {
+            // Generate a unique username
+            let baseUsername = user.email.split("@")[0];
+            let username = baseUsername;
             let suffix = 1;
 
-            while (existingUser) {
-              username = `${user.email.split("@")[0]}${suffix}`;
-              existingUser = await userModel.findOne({ username });
+            while (await userModel.findOne({ username })) {
+              username = `${baseUsername}${suffix}`;
               suffix++;
             }
 
@@ -46,42 +45,44 @@ export const authOptions = {
 
             const savedUser = await newUser.save();
             token.id = savedUser._id;
-            token.isAdmin = false;
+            token.username = savedUser.username;
+            token.isAdmin = savedUser.isAdmin;
             token.isSuper = false;
-            token.username = username;
+            token.blocked = false;
           } else {
-            token.id = userExist._id;
-            token.isAdmin = userExist.isAdmin;
-            token.isSuper = userExist.isSuper;
-            token.username = userExist.username;
-            token.blocked = userExist.blocked;
+            token.id = existingUser._id;
+            token.username = existingUser.username;
+            token.isAdmin = existingUser.isAdmin;
+            token.isSuper = existingUser.isSuper;
+            token.blocked = existingUser.blocked;
           }
         }
+
         return token;
       } catch (error) {
-        console.error("Error in JWT callback:", error);
+        console.error("JWT Callback Error:", error);
         return token;
       }
     },
+
     async session({ session, token }) {
       try {
-        session.user.username = token.username;
         session.user.id = token.id;
+        session.user.username = token.username;
         session.user.isAdmin = token.isAdmin;
         session.user.isSuper = token.isSuper;
-        session.user.blocked = token?.blocked;
+        session.user.blocked = token.blocked;
         return session;
       } catch (error) {
-        console.error("Error in session callback:", error);
+        console.error("Session Callback Error:", error);
         return session;
       }
     },
   },
   events: {
     error: (message) => {
-      console.error("NextAuth error:", message);
+      console.error("NextAuth error event:", message);
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
-
-export default NextAuth(authOptions);
