@@ -20,12 +20,12 @@ export const generateMetadata = async ({ params }) => {
     description: desc.substring(0, 160),
     creator: data.author,
     alternates: {
-      canonical: `https://www.techblog.me/blogs/${params.slug}`,
+      canonical: `http://localhost:3000/blogs/${params.slug}`,
     },
     openGraph: {
       title: data.title,
       description: desc.substring(0, 200),
-      url: "https://www.techblog.me/blogs/" + params.slug,
+      url: "http://localhost:3000/blogs/" + params.slug,
       siteName: "Tech Blog",
       images: [
         {

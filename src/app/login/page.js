@@ -5,13 +5,13 @@ export const metadata = {
   description:
     "Access your Tech Blog account to manage your posts, view analytics, and connect with other bloggers. Secure and easy login to keep you connected.",
   alternates: {
-    canonical: "https://www.techblog.me/login",
+    canonical: "http://localhost:3000/login",
   },
   openGraph: {
     title: "Login - Tech Blog",
     description:
       "Access your Tech Blog account to manage your posts, view analytics, and connect with other bloggers. Secure and easy login to keep you connected.",
-    url: "https://www.techblog.me/login",
+    url: "http://localhost:3000/login",
     site_name: "Tech Blog",
   },
   twitter: {

@@ -12,7 +12,7 @@ export async function generateMetadata({ params }) {
     title: `${category} blogs`,
     description: `Explore a wide range of ${category} blogs on Tech Blog. Join our community of readers today.`,
     alternates: {
-      canonical: `https://www.techblog.me/category/${category}`,
+      canonical: `http://localhost:3000/category/${category}`,
     },
   };
 }
