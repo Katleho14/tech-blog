@@ -5,16 +5,19 @@ import Link from "next/link";
 import Comments from "@/components/Blogs/Comments";
 import BlogCustomization from "@/components/Blogs/BlogCustomization";
 import Markdown from "markdown-to-jsx";
-import dynamin from "next/dynamic";
-const CodeBlock = dynamin(() => import("@/components/Code/CodeBlock"));
+import dynamic from "next/dynamic";
+const CodeBlock = dynamic(() => import("@/components/Code/CodeBlock"));
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 export const generateMetadata = async ({ params }) => {
   const data = await getData(`/api/blogs/${params.slug}`);
+
   if ("error" in data) {
     return { title: "Blog Not Found", description: "Blog Not Found" };
   }
+
   const desc = data.description || data.content;
+
   return {
     title: data.title,
     description: desc.substring(0, 160),
@@ -25,7 +28,7 @@ export const generateMetadata = async ({ params }) => {
     openGraph: {
       title: data.title,
       description: desc.substring(0, 200),
-      url: "http://localhost:3000/blogs/" + params.slug,
+      url: `http://localhost:3000/blogs/${params.slug}`,
       siteName: "Tech Blog",
       images: [
         {
@@ -64,7 +67,7 @@ const Blog = async ({ params }) => {
         <div className="flex flex-col gap-10 my-10">
           <div className="space-y-5">
             <BlogCustomization
-              slug={params.slug}
+              slug={slug}
               blogId={data?._id}
               userId={data?.userId}
             />
@@ -111,3 +114,4 @@ const Blog = async ({ params }) => {
 };
 
 export default Blog;
+

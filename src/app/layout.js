@@ -11,9 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning={true}>
-      <body
-        className={`${inter.className} class="overflow-x-hidden dark:bg-black"`}
-      >
+      <body className={`${inter.className} overflow-x-hidden dark:bg-black`}>
         {process.env.ENV === "production" && (
           <>
             <Script
