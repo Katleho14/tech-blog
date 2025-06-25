@@ -6,7 +6,7 @@ export const authOptions = {
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         // Replace with your own user validation logic
@@ -17,20 +17,11 @@ export const authOptions = {
           return { id: "1", name: "Demo User", email: "user@example.com" };
         }
         return null;
-      },
-    }),
-    // You can add GoogleProvider and GithubProvider here if needed
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_CLIENT_ID,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    // }),
-    // GithubProvider({
-    //   clientId: process.env.GITHUB_CLIENT_ID,
-    //   clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    // }),
+      }
+    })
   ],
   session: {
-    strategy: "jwt",
+    strategy: "jwt"
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -48,12 +39,6 @@ export const authOptions = {
         session.user.name = token.name;
       }
       return session;
-    },
-  },
-  events: {
-    error: (message) => {
-      console.error("NextAuth error event:", message);
-    },
-  },
-  secret: process.env.NEXTAUTH_SECRET,
+    }
+  }
 };
