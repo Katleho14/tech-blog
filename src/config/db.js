@@ -1,17 +1,17 @@
 import mongoose from "mongoose";
 
-let isConnected = false;
-
-export const connectDB = async () => {
-  if (isConnected) return;
-
+export async function connectDB() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    isConnected = true;
-    console.log("✅ MongoDB connected");
-  } catch (err) {
-    console.error("❌ MongoDB connection failed:", err.message);
-    throw err;
+    mongoose.connect(process.env.URI);
+    const connection = mongoose.connection;
+    connection.on("connected", () => {
+      console.log("Connected to DataBase Successfuly!");
+    });
+    connection.on("error", (err) => {
+      console.log(err.message);
+      process.exit();
+    });
+  } catch (error) {
+    console.log(error.message);
   }
-};
-
+}

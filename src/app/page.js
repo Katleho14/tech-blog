@@ -11,15 +11,15 @@ export async function generateMetadata() {
     title: "Discover Engaging and Insightful Blogs",
     description:
       "Explore a wide range of captivating blogs on Tech Blog. Join our community of readers today.",
-    metadatabase: new URL("http://localhost:3000"),
+    metadatabase: new URL("https://www.techblog.me"),
     alternates: {
-      canonical: `http://localhost:3000`,
+      canonical: `https://www.techblog.me`,
     },
   };
 }
 
 const Home = async ({ searchParams }) => {
-  const pageNo = parseInt(searchParams?.page) || 1;
+  const pageNo = parseInt(searchParams.page) || 1;
   const data = await getData(`/api/blogs?page=${pageNo}&limit=20`);
 
   return (

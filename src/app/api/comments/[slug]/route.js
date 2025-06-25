@@ -1,35 +1,32 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]/options";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import { connectDB } from "@/config/db";
+import { authOptions } from "../../auth/[...nextauth]/options";
 import commentModel from "@/models/commentModel";
+import { connectDB } from "@/config/db";
 
-export async function GET(req, { params }) {
-  const blogId = params.id;
-
-  // Get session (if any), no auth enforcement
-  const session = await getServerSession(authOptions, req);
+export const GET = async (req, { params }) => {
+  const blogId = params.slug;
+  const session = await getServerSession(authOptions);
   const userId = session?.user?.id;
 
   try {
     await connectDB();
-
     const comments = await commentModel.find({ blogId }).lean();
-
-    if (!comments || comments.length === 0) {
-      return NextResponse.json({ error: "This blog has no comments." }, { status: 404 });
+    if (!comments) {
+      return NextResponse.json(
+        {
+          error: "This blog has no comments.",
+        },
+        { status: 404 }
+      );
     }
-
-    const commentsWithUserFlag = comments.map((item) => ({
-      ...item,
-      isUser: userId ? item.userId?.toString() === userId : false,
-    }));
-
-    return NextResponse.json(commentsWithUserFlag);
+    const sortedComments = await comments.map((item) => {
+      return { ...item, isUser: item.userId === userId };
+    });
+    return NextResponse.json(sortedComments);
   } catch (error) {
-    console.error("Error fetching comments:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({
+      error: error.message,
+    });
   }
-}
-
-
+};

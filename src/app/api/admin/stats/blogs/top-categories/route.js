@@ -6,8 +6,7 @@ import { NextResponse } from "next/server";
 
 export const GET = async (req, res) => {
   try {
-    await connectDB(); // ✅ FIXED: await the DB connection
-
+    connectDB();
     const topCategories = await blogs.aggregate([
       { $group: { _id: "$category", blogCount: { $sum: 1 } } },
       { $sort: { blogCount: -1 } },
@@ -15,8 +14,6 @@ export const GET = async (req, res) => {
 
     return NextResponse.json(topCategories);
   } catch (err) {
-    console.error("GET /api/blogs error:", err); // Add logging
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 };
-

@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 const useSend = () => {
-  const [isErr, setIsErr] = useState(false);
-  const [error, setError] = useState("");
+  const [isErr, setIsError] = useState(false);
+  const [err, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const fetchData = async (url, method = "GET", body = {}) => {
@@ -31,7 +31,7 @@ const useSend = () => {
       }
       return res;
     } catch (error) {
-      setIsErr(true);
+      setIsError(true);
       setError(error.message);
       return { error: error.message };
     } finally {
@@ -39,7 +39,7 @@ const useSend = () => {
     }
   };
 
-  return { fetchData, isErr, error, loading };
+  return { fetchData, isErr, err, loading };
 };
 
 export default useSend;
