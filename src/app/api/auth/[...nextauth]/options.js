@@ -6,7 +6,7 @@ import GithubProvider from "next-auth/providers/github";
 import { connectDB } from "@/config/db";
 import userModel from "@/models/userModel";
 
-const handler = NextAuth({
+const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -18,7 +18,7 @@ const handler = NextAuth({
     }),
   ],
   session: {
-    jwt: true,
+    strategy: "jwt", // optional, more explicit than 'jwt: true'
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -48,14 +48,14 @@ const handler = NextAuth({
 
             const savedUser = await newUser.save();
             token.id = savedUser._id;
+            token.username = username;
             token.isAdmin = false;
             token.isSuper = false;
-            token.username = username;
           } else {
             token.id = userExist._id;
+            token.username = userExist.username;
             token.isAdmin = userExist.isAdmin;
             token.isSuper = userExist.isSuper;
-            token.username = userExist.username;
             token.blocked = userExist.blocked;
           }
         }
@@ -67,8 +67,8 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       try {
-        session.user.username = token.username;
         session.user.id = token.id;
+        session.user.username = token.username;
         session.user.isAdmin = token.isAdmin;
         session.user.isSuper = token.isSuper;
         session.user.blocked = token?.blocked;
@@ -85,7 +85,10 @@ const handler = NextAuth({
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
 
-export { handler as GET, handler as POST };
+// ✅ EXPORT correctly
+export const GET = NextAuth(authOptions);
+export const POST = NextAuth(authOptions);
+
 
