@@ -19,7 +19,7 @@ export async function generateMetadata() {
 }
 
 const Home = async ({ searchParams }) => {
-  const pageNo = parseInt(searchParams.page) || 1;
+  const pageNo = parseInt(searchParams?.page) || 1;
   const data = await getData(`/api/blogs?page=${pageNo}&limit=20`);
 
   return (
