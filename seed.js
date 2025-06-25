@@ -3,14 +3,14 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Blog from "./src/models/blogModel.js"; // Adjust if your model file name is different
-import posts from "./src/utils/posts.js";
+import posts from "./src/utils/post.js";
 
 dotenv.config();
 
 async function seedDatabase() {
   try {
     console.log("Connecting to MongoDB...");
-    await mongoose.connect(process.env.MONGODB_URI, {
+    await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
