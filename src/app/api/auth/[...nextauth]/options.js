@@ -1,12 +1,10 @@
-// src/app/api/auth/[...nextauth]/route.js
-
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { connectDB } from "@/config/db";
 import userModel from "@/models/userModel";
 
-const authOptions = {
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -18,7 +16,7 @@ const authOptions = {
     }),
   ],
   session: {
-    strategy: "jwt", // optional, more explicit than 'jwt: true'
+    jwt: true,
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -48,14 +46,14 @@ const authOptions = {
 
             const savedUser = await newUser.save();
             token.id = savedUser._id;
-            token.username = username;
             token.isAdmin = false;
             token.isSuper = false;
+            token.username = username;
           } else {
             token.id = userExist._id;
-            token.username = userExist.username;
             token.isAdmin = userExist.isAdmin;
             token.isSuper = userExist.isSuper;
+            token.username = userExist.username;
             token.blocked = userExist.blocked;
           }
         }
@@ -67,8 +65,8 @@ const authOptions = {
     },
     async session({ session, token }) {
       try {
-        session.user.id = token.id;
         session.user.username = token.username;
+        session.user.id = token.id;
         session.user.isAdmin = token.isAdmin;
         session.user.isSuper = token.isSuper;
         session.user.blocked = token?.blocked;
@@ -84,11 +82,6 @@ const authOptions = {
       console.error("NextAuth error:", message);
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
 };
 
-// ✅ EXPORT correctly
-export const GET = NextAuth(authOptions);
-export const POST = NextAuth(authOptions);
-
-
+export default NextAuth(authOptions);
