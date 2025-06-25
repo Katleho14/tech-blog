@@ -1,11 +1,8 @@
-export const revalidate = 0;
-
 import { NextResponse } from "next/server";
 import blogs from "@/models/blogModel";
 import { connectDB } from "@/config/db";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/options";
 import { deleteImage } from "@/config/cloudinary";
 
 export const GET = async (req) => {
