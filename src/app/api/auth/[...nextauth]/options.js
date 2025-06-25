@@ -3,7 +3,7 @@ import GithubProvider from "next-auth/providers/github";
 import { connectDB } from "@/config/db";
 import userModel from "@/models/userModel";
 
-export const authOptions = {
+const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -15,7 +15,7 @@ export const authOptions = {
     }),
   ],
   session: {
-    strategy: "jwt", // Use 'jwt' for stateless sessions
+    strategy: "jwt",
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -86,3 +86,5 @@ export const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
+
+export { authOptions };
