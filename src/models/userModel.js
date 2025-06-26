@@ -1,31 +1,34 @@
 import mongoose from "mongoose";
 import pkg from "validator";
+
 const { isEmail } = pkg;
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     googleId: {
       type: String,
     },
     username: {
       type: String,
-      required: [true, "username is required"],
+      required: [true, "Username is required"],
       lowercase: true,
       unique: true,
+      trim: true,
     },
     displayName: {
       type: String,
+      trim: true,
     },
     email: {
       type: String,
-      required: [true, "email is required"],
+      required: [true, "Email is required"],
       lowercase: true,
-      validate: [isEmail, "Please enter a valid email"],
       unique: true,
+      validate: [isEmail, "Please enter a valid email"],
     },
     profileImg: {
       type: String,
-      required: [true, "profile image is required"],
+      required: [true, "Profile image is required"],
     },
     bio: {
       type: String,
@@ -47,5 +50,8 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const userModel = mongoose.models.users || mongoose.model("users", userSchema);
+// Prevent overwrite on hot reload (Next.js dev mode)
+const userModel = mongoose.models.User || mongoose.model("User", userSchema);
+
 export default userModel;
+
