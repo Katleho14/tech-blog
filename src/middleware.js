@@ -22,7 +22,7 @@ export async function middleware(request) {
 
     if (pathname.startsWith("/login")) {
       return NextResponse.redirect(
-        new URL(`/users/${token.username}`, request.url)
+        new URL(`/users/${String(token.username)}`, request.url)
       );
     }
 
