@@ -6,6 +6,9 @@ const userSchema = new mongoose.Schema(
     googleId: {
       type: String,
     },
+    githubId: {
+      type: String,
+    },
     username: {
       type: String,
       required: [true, "Username is required"],
@@ -27,6 +30,7 @@ const userSchema = new mongoose.Schema(
     profileImg: {
       type: String,
       required: [true, "Profile image is required"],
+      default: "/default-profile.png",
     },
     bio: {
       type: String,
@@ -48,7 +52,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Prevent overwrite on hot reload (Next.js dev mode)
 const userModel = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default userModel;

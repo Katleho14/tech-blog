@@ -70,7 +70,7 @@ export const authOptions = {
         return true;
       } catch (error) {
         console.error("❌ Error in signIn callback:", error.message);
-        return process.env.NODE_ENV === "production" ? true : false;
+        return process.env.NODE_ENV === "production";
       }
     },
 
