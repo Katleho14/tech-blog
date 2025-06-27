@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
-import pkg from "validator";
-
-const { isEmail } = pkg;
+import validator from "validator";
 
 const userSchema = new mongoose.Schema(
   {
@@ -24,7 +22,7 @@ const userSchema = new mongoose.Schema(
       required: [true, "Email is required"],
       lowercase: true,
       unique: true,
-      validate: [isEmail, "Please enter a valid email"],
+      validate: [validator.isEmail, "Please enter a valid email"],
     },
     profileImg: {
       type: String,
