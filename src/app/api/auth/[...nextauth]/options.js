@@ -20,44 +20,67 @@ export const authOptions = {
   },
 
   callbacks: {
-    async signIn({ user, account }) {
-      await connectDB();
+    async signIn({ user, account, profile }) {
+      try {
+        if (!user?.email) {
+          console.error("No email provided by OAuth provider");
+          return false;
+        }
 
-      const existingUser = await userModel.findOne({ email: user.email });
+        await connectDB();
 
-      if (!existingUser) {
-        const newUser = new userModel({
-          googleId: account.provider === "google" ? account.providerAccountId : undefined,
-          username: user.name?.toLowerCase().replace(/\s+/g, "_") || `user_${Date.now()}`,
-          displayName: user.name || "No Name",
-          email: user.email,
-          profileImg: user.image || "/default-profile.png", // fallback
-        });
+        const existingUser = await userModel.findOne({ email: user.email });
 
-        await newUser.save();
+        if (!existingUser) {
+          const username = user.name?.toLowerCase().replace(/\s+/g, "_") || `user_${Date.now()}`;
+          
+          const newUser = new userModel({
+            googleId: account?.provider === "google" ? account.providerAccountId : undefined,
+            username,
+            displayName: user.name || "No Name",
+            email: user.email,
+            profileImg: user.image || "/default-profile.png",
+          });
+
+          await newUser.save();
+          console.log("✅ New user created:", username);
+        }
+
+        return true;
+      } catch (error) {
+        console.error("❌ SignIn error:", error);
+        return false;
       }
-
-      return true;
     },
 
     async session({ session, token }) {
-      if (token?.sub) {
-        session.user.id = token.sub;
+      try {
+        if (token?.sub) {
+          session.user.id = token.sub;
 
-        // Optional: populate full user details in session
-        const dbUser = await userModel.findOne({ email: session.user.email });
+          // Connect to DB before querying - this was missing!
+          await connectDB();
+          
+          const dbUser = await userModel.findOne({ email: session.user.email });
 
-        if (dbUser) {
-          session.user.username = dbUser.username;
-          session.user.profileImg = dbUser.profileImg;
-          session.user.isAdmin = dbUser.isAdmin;
-          session.user.blocked = dbUser.blocked;
+          if (dbUser) {
+            session.user.username = dbUser.username;
+            session.user.profileImg = dbUser.profileImg;
+            session.user.isAdmin = dbUser.isAdmin || false;
+            session.user.blocked = dbUser.blocked || false;
+          }
         }
+        return session;
+      } catch (error) {
+        console.error("❌ Session callback error:", error);
+        return session;
       }
-      return session;
     },
 
-    async jwt({ token }) {
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id;
+      }
       return token;
     },
   },
