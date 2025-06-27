@@ -1,16 +1,17 @@
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 
-// Dynamic imports to prevent build-time issues
+// Dynamically import connectDB and userModel at runtime only
 let connectDB, userModel;
 
-// Only import database modules in runtime, not during build
+// Lazy-load DB modules to avoid build-time issues
 const getDatabaseModules = async () => {
   if (!connectDB || !userModel) {
-    const { connectDB: dbConnect } = await import("@/config/db");
-    const { default: UserModel } = await import("@/models/userModel");
-    connectDB = dbConnect;
-    userModel = UserModel;
+    const db = await import("@/config/db");
+    const model = await import("@/models/userModel");
+
+    connectDB = db.default; // for default export
+    userModel = model.default;
   }
   return { connectDB, userModel };
 };
@@ -32,16 +33,16 @@ export const authOptions = {
   },
 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       try {
         if (!user?.email) {
-          console.error("No email provided by OAuth provider");
+          console.error("❌ No email from OAuth provider");
           return false;
         }
 
-        // Skip database operations during build
-        if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL && !process.env.MONGODB_URI) {
-          console.log("Skipping database operations during build");
+        // Skip DB ops if no URI (prevents build crash)
+        if (process.env.NODE_ENV === "production" && !process.env.MONGODB_URI) {
+          console.log("⚠️ Skipping DB during production build (no MONGODB_URI)");
           return true;
         }
 
@@ -52,7 +53,7 @@ export const authOptions = {
 
         if (!existingUser) {
           const username = user.name?.toLowerCase().replace(/\s+/g, "_") || `user_${Date.now()}`;
-          
+
           const newUser = new userModel({
             googleId: account?.provider === "google" ? account.providerAccountId : undefined,
             githubId: account?.provider === "github" ? account.providerAccountId : undefined,
@@ -68,41 +69,35 @@ export const authOptions = {
 
         return true;
       } catch (error) {
-        console.error("❌ SignIn error:", error);
-        // Don't fail authentication due to database errors during build
-        if (process.env.NODE_ENV === 'production' && error.message?.includes('ENOTFOUND')) {
-          console.log("Database connection failed during build, continuing...");
-          return true;
-        }
-        return false;
+        console.error("❌ Error in signIn callback:", error.message);
+        return process.env.NODE_ENV === "production" ? true : false;
       }
     },
 
     async session({ session, token }) {
       try {
-        if (token?.sub) {
-          session.user.id = token.sub;
+        if (!session?.user?.email) return session;
 
-          // Skip database operations during build
-          if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL && !process.env.MONGODB_URI) {
-            return session;
-          }
-
-          const { connectDB, userModel } = await getDatabaseModules();
-          await connectDB();
-          
-          const dbUser = await userModel.findOne({ email: session.user.email });
-
-          if (dbUser) {
-            session.user.username = dbUser.username;
-            session.user.profileImg = dbUser.profileImg;
-            session.user.isAdmin = dbUser.isAdmin || false;
-            session.user.blocked = dbUser.blocked || false;
-          }
+        if (process.env.NODE_ENV === "production" && !process.env.MONGODB_URI) {
+          return session;
         }
+
+        const { connectDB, userModel } = await getDatabaseModules();
+        await connectDB();
+
+        const dbUser = await userModel.findOne({ email: session.user.email });
+
+        if (dbUser) {
+          session.user.id = dbUser._id.toString();
+          session.user.username = dbUser.username;
+          session.user.profileImg = dbUser.profileImg;
+          session.user.isAdmin = dbUser.isAdmin || false;
+          session.user.blocked = dbUser.blocked || false;
+        }
+
         return session;
       } catch (error) {
-        console.error("❌ Session callback error:", error);
+        console.error("❌ Error in session callback:", error.message);
         return session;
       }
     },
