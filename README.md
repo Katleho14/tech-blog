@@ -35,7 +35,7 @@ Installation
 
 1.  Clone the repository:
 
-    `git clone https://github.com/lakshaybabbar/blog-app.git`
+    `git clone https://github.com/Katleho14/tech-blog.git`
 
 2.  Navigate to the project directory:
 
@@ -102,4 +102,4 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 Contact
 -------
 
-For any questions or suggestions, please contact Lakshay Babbar.
+For any questions or suggestions, please contact Katleho <your-email@example.com>.
