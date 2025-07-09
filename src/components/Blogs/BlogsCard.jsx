@@ -39,7 +39,7 @@ const BlogsCard = ({ data, route, refetchData }) => {
     <div className="w-full sm:w-[48%] lg:w-[30%] xl:w-72 xl:max-w-80 xl:flex-grow flex flex-col rounded-xl bg-gray-900 shadow-md">
       <div className="w-full overflow-hidden rounded-t-xl">
         <Image
-          src={data.img.url}
+          src={data.img}
           alt={data.title}
           width={300}
           height={200}

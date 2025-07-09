@@ -7,8 +7,8 @@ const Featured = ({ blog }) => {
   return (
     <section className="w-full mb-10 flex items-center md:items-start flex-col md:flex-row justify-between gap-10">
       <Image
-        src={blog?.img?.url}
-        alt={blog?.title}
+        src={blog.img}
+        alt={blog.title}
         width={600}
         height={400}
         className="aspect-video w-full md:w-[50%] 2xl:w-[35rem]"

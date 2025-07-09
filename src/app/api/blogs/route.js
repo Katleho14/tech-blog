@@ -12,12 +12,12 @@ export const GET = async (request) => {
   try {
     let filter = {};
     if (category && category !== "all") {
-      filter.category = category;
+      filter.category = new RegExp(`^${category}$`, "i");
     }
     await connectDB();
 
     const featuredBlog = await blogs
-      .findOne({ featured: true, category })
+      .findOne({ featured: true, category: new RegExp(`^${category}$`, "i") })
       .select("-content -__v -updatedAt -userId");
 
     if (featuredBlog) {

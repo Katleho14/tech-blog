@@ -72,7 +72,7 @@ export const POST = async (req) => {
       content,
       category,
       img: {
-        public_id: inaryRes.public_id,
+        public_id: cloudinaryRes.public_id,
         url: cloudinaryRes.secure_url,
       },
       author: user?.username,
