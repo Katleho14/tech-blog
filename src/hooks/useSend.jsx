@@ -25,7 +25,9 @@ const useSend = () => {
         }
       }
 
-      const req = await fetch(process.env.NEXT_PUBLIC_API_URL + url, options);
+      // Use NEXT_PUBLIC_API_URL if set, otherwise fallback to relative
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      const req = await fetch(baseUrl + url, options);
       const res = await req.json();
       if (!req.ok) {
         throw new Error(res.error || res.message || "Something went wrong");
