@@ -20,9 +20,7 @@ export async function generateMetadata({ params }) {
 const page = async ({ params, searchParams }) => {
   const { category } = params;
   const pageNo = parseInt(searchParams.page) || 1;
-  const data = await getData(
-    `/api/blogs?category=${category}&page=${pageNo}&limit=12`
-  );
+  const data = await getData(`/api/blogs?category=${category}&page=${pageNo}&limit=12`);
   if (!data) {
     return <LoadingSpinner />;
   }
